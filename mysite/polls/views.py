@@ -12,7 +12,13 @@ class IndexView(generic.ListView):
     context_object_name = "latest_question_list"
 
     def get_queryset(self):
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        questions_with_choices = []
+        for question in Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]:
+            if question.choice_set.exists():
+                questions_with_choices.append(question)
+                if len(questions_with_choices) == 5:
+                    break
+        return questions_with_choices
     
 class DetailView(generic.DetailView):
     model = Question
